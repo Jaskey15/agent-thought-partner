@@ -22,7 +22,7 @@
   "homepage": "https://github.com/Jaskey15/agent-thought-partner#readme",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
-    "ai": "^6.0.14",
+    "ai": "^3.4.33",
     "next": "^16.1.1",
     "react": "^19.2.3",
     "react-dom": "^19.2.3"
