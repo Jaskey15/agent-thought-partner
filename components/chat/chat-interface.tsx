@@ -13,7 +13,7 @@ export function ChatInterface() {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
 
-  const { messages, handleSubmit, isLoading, error } = useChat({
+  const { messages, append, isLoading, error } = useChat({
     api: '/api/chat',
     body: {
       mode,
@@ -51,11 +51,11 @@ export function ChatInterface() {
   });
 
   // Handle voice transcript completion
-  const handleVoiceTranscript = (transcript: string) => {
-    // Create a synthetic form event to submit via useChat
-    const event = new Event('submit') as any;
-    handleSubmit(event, {
-      data: { content: transcript }
+  const handleVoiceTranscript = async (transcript: string) => {
+    // Use append to add user message and trigger AI response
+    await append({
+      role: 'user',
+      content: transcript,
     });
   };
 

@@ -9,13 +9,17 @@ export const useSpeechSynthesis = () => {
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const isProcessingRef = useRef(false);
 
-  const speak = useCallback((text: string, options?: { rate?: number; pitch?: number; volume?: number }) => {
+  const speak = useCallback((text: string, options?: { rate?: number; pitch?: number; volume?: number; onComplete?: () => void }) => {
     const synthesis = getSpeechSynthesis();
 
     if (!synthesis) {
       console.error('Speech synthesis not supported');
+      options?.onComplete?.();
       return;
     }
+
+    // Cancel any ongoing speech first
+    synthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);
 
@@ -37,11 +41,18 @@ export const useSpeechSynthesis = () => {
     utterance.onend = () => {
       setIsSpeaking(false);
       utteranceRef.current = null;
+      options?.onComplete?.();
     };
 
     utterance.onerror = (event) => {
-      console.error('Speech synthesis error:', event);
+      console.error('Speech synthesis error:', {
+        error: event.error,
+        charIndex: event.charIndex,
+        elapsedTime: event.elapsedTime,
+        name: event.name,
+      });
       setIsSpeaking(false);
+      options?.onComplete?.();
     };
 
     utteranceRef.current = utterance;

@@ -15,16 +15,10 @@ export function VoicePlayback({ text, autoPlay = true, onComplete, onStart }: Vo
 
   useEffect(() => {
     if (text && autoPlay && !isSpeaking) {
-      speak(text);
       onStart?.();
+      speak(text, { onComplete });
     }
-  }, [text, autoPlay]);
-
-  useEffect(() => {
-    if (!isSpeaking && text && onComplete) {
-      onComplete();
-    }
-  }, [isSpeaking]);
+  }, [text, autoPlay, speak, onStart, onComplete]);
 
   if (!text) return null;
 
