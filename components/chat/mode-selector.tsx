@@ -13,8 +13,8 @@ export function ModeSelector({ currentMode, onModeChange, disabled = false }: Mo
   const modes: Mode[] = ['listen', 'clarify', 'challenge'];
 
   return (
-    <div className="flex gap-2 p-4 border-b border-gray-200 dark:border-gray-800">
-      <span className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center mr-2">
+    <div className="flex gap-2 p-3 border-b border-gray-200 dark:border-gray-800">
+      <span className="text-xs font-medium text-gray-700 dark:text-gray-300 flex items-center mr-1">
         Mode:
       </span>
       {modes.map((mode) => {
@@ -27,7 +27,7 @@ export function ModeSelector({ currentMode, onModeChange, disabled = false }: Mo
             disabled={disabled}
             title={MODE_DESCRIPTIONS[mode]}
             className={`
-              px-4 py-2 rounded-lg text-sm font-medium transition-all
+              px-3 py-1.5 rounded-lg text-xs font-medium transition-all
               ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
               ${
                 isActive

@@ -4,14 +4,16 @@ import { useState, useEffect } from 'react';
 import { useChat } from 'ai/react';
 import type { Mode } from '@/lib/types';
 import { ModeSelector } from './mode-selector';
-import { MessageList } from './message-list';
-import { MessageInput } from './message-input';
+import { ConversationHistoryVoice } from './conversation-history-voice';
+import { VoicePlayback } from './voice-playback';
+import { VoiceRecorder } from './voice-recorder';
 
 export function ChatInterface() {
   const [mode, setMode] = useState<Mode>('listen');
   const [conversationId, setConversationId] = useState<string | null>(null);
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading, error } = useChat({
+  const { messages, handleSubmit, isLoading, error } = useChat({
     api: '/api/chat',
     body: {
       mode,
@@ -40,28 +42,46 @@ export function ChatInterface() {
   }, []);
 
   // Update messages with mode information for display
-  const messagesWithMode = messages.map((msg) => ({
-    ...msg,
-    data: { ...msg.data, mode: msg.role === 'assistant' ? mode : undefined },
-  }));
+  const messagesWithMode = messages.map((msg) => {
+    const existingData = typeof msg.data === 'object' && msg.data !== null ? msg.data : {};
+    return {
+      ...msg,
+      data: { ...existingData, mode: msg.role === 'assistant' ? mode : undefined },
+    };
+  });
+
+  // Handle voice transcript completion
+  const handleVoiceTranscript = (transcript: string) => {
+    // Create a synthetic form event to submit via useChat
+    const event = new Event('submit') as any;
+    handleSubmit(event, {
+      data: { content: transcript }
+    });
+  };
+
+  // Get latest AI message for TTS auto-play
+  const latestAIMessage = messages.length > 0 && messages[messages.length - 1].role === 'assistant'
+    ? messages[messages.length - 1]
+    : null;
+
+  // Coordination logic
+  const canRecord = !isSpeaking && !isLoading;
+  const canChangeMode = !isSpeaking && !isLoading;
 
   return (
     <div className="flex flex-col h-screen bg-white dark:bg-gray-950">
       {/* Header */}
-      <header className="border-b border-gray-200 dark:border-gray-800 p-4">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-          Second Brain with Opinions
+      <header className="border-b border-gray-200 dark:border-gray-800 p-3">
+        <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+          Voice Assistant
         </h1>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-          Choose your interaction mode and start thinking out loud
-        </p>
       </header>
 
       {/* Mode Selector */}
       <ModeSelector
         currentMode={mode}
         onModeChange={setMode}
-        disabled={isLoading}
+        disabled={!canChangeMode}
       />
 
       {/* Error Display */}
@@ -73,15 +93,23 @@ export function ChatInterface() {
         </div>
       )}
 
-      {/* Messages */}
-      <MessageList messages={messagesWithMode} isLoading={isLoading} />
+      {/* Conversation History */}
+      <ConversationHistoryVoice messages={messagesWithMode} />
 
-      {/* Input */}
-      <MessageInput
-        input={input}
-        isLoading={isLoading}
-        onInputChange={handleInputChange}
-        onSubmit={handleSubmit}
+      {/* Voice Playback (TTS for AI responses) */}
+      {latestAIMessage && (
+        <VoicePlayback
+          text={latestAIMessage.content}
+          autoPlay={true}
+          onStart={() => setIsSpeaking(true)}
+          onComplete={() => setIsSpeaking(false)}
+        />
+      )}
+
+      {/* Voice Recorder (STT for user input) */}
+      <VoiceRecorder
+        onTranscriptComplete={handleVoiceTranscript}
+        isDisabled={!canRecord}
       />
     </div>
   );
