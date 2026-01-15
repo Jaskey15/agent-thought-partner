@@ -2,24 +2,22 @@
 
 All chat UI components live in `/components/chat/`.
 
-## Current (Text-Based)
+## Voice Components
 
-- `chat-interface.tsx` - Main orchestrator, uses Vercel AI's `useChat` hook
-- `mode-selector.tsx` - Three-button mode toggle (Listen/Clarify/Challenge)
-- `message-list.tsx` - Displays conversation history
-- `message-input.tsx` - Textarea for text input
+- `chat-interface.tsx` - Main orchestrator with voice state coordination
+- `mode-selector.tsx` - Three-button mode toggle (compact)
+- `voice-recorder.tsx` - Push-to-talk STT (mouse/touch/keyboard)
+- `voice-playback.tsx` - TTS with auto-play & stop button
+- `conversation-history-voice.tsx` - Compact history with replay
 
-## Voice Interface (In Progress)
+## Hooks
 
-**Replacing:**
-- `message-input.tsx` → `voice-recorder.tsx` (push-to-talk STT)
-- `message-list.tsx` → `conversation-history-voice.tsx` (compact display)
+- `/hooks/use-speech-recognition.ts` - STT state & logic
+- `/hooks/use-speech-synthesis.ts` - TTS queue & playback
 
-**Adding:**
-- `voice-playback.tsx` - TTS for AI responses with auto-play
-- `/hooks/use-speech-recognition.ts` - STT logic
-- `/hooks/use-speech-synthesis.ts` - TTS logic
-- `/lib/speech-utils.ts` - Web Speech API utilities
+## Utilities
+
+- `/lib/speech-utils.ts` - Browser detection, sentence parsing
 
 ## Patterns
 
@@ -35,5 +33,11 @@ chat-interface.tsx (useChat hook)
   ├─ mode (Listen/Clarify/Challenge)
   ├─ messages (conversation history)
   ├─ isLoading (API request status)
+  ├─ isSpeaking (TTS playback status)
   └─ conversationId (persisted in localStorage)
 ```
+
+**Coordination:**
+- Recording disabled while AI speaking or loading
+- Mode switching disabled while speaking or loading
+- Latest AI message auto-plays via TTS

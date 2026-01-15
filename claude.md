@@ -18,15 +18,13 @@ Voice-first AI assistant for thinking out loud with three interaction modes.
 
 ## Current State
 
-**Transitioning from text chat → voice-only interface**
+**Voice-only interface** ✅ Complete
 
-Plan: `/.claude/plans/proud-wibbling-kernighan.md`
-
-- Text chat: ✅ Working
-- Voice interface: 🚧 In progress
-  - Push-to-talk (hold button to speak)
-  - Auto-play AI responses
-  - Browser's native Speech API (free)
+- Push-to-talk (hold button or spacebar to speak)
+- Auto-play AI responses via TTS
+- Browser's native Speech API (free, no dependencies)
+- Compact conversation history with replay
+- Real-time transcript display
 
 ## Quick Start
 
@@ -39,10 +37,13 @@ npm run dev
 
 ## Architecture
 
-- `/app/api/chat` - Streaming chat endpoint
-- `/components/chat` - UI components
-- `/lib` - Business logic (prompts, storage, types)
+- `/app/api/chat` - Streaming chat endpoint (unchanged)
+- `/components/chat` - Voice UI components
+- `/hooks` - Speech recognition & synthesis hooks
+- `/lib` - Business logic (prompts, storage, types, speech utils)
 - `/data/conversations` - Persisted conversations (JSON files)
 
-**Key decision:** No database. File-based storage keeps it simple.
-**Key decision:** Voice is UI-only. API stays text-based (STT→text→API→text→TTS).
+**Key decisions:**
+- No database. File-based storage keeps it simple.
+- Voice is UI-only. API stays text-based (STT→text→API→text→TTS).
+- No npm packages for voice. Native Web Speech API only.

@@ -5,7 +5,7 @@
 - `types.ts` - TypeScript interfaces (Mode, Message, Conversation)
 - `prompts.ts` - System prompts for each mode + mode validation
 - `storage.ts` - File-based conversation persistence
-- `speech-utils.ts` - (In progress) Web Speech API utilities
+- `speech-utils.ts` - Web Speech API utilities
 
 ## Mode System
 
@@ -39,10 +39,13 @@ Conversation ID persisted in browser's localStorage.
 
 Recent context (last 10 messages) loaded on each API call.
 
-## Speech Utilities (Voice Interface)
+## Speech Utilities
 
-- Browser detection (Chrome/Safari/Edge support)
-- SpeechRecognition setup (continuous, interim results)
-- SpeechSynthesis configuration
-- Sentence extraction for chunked TTS
-- iOS Safari special handling (auto-play unlock)
+**`speech-utils.ts` functions:**
+- `getSpeechRecognition()` - Get browser's API with webkit fallback
+- `getSpeechSynthesis()` - Get TTS API
+- `checkBrowserSupport()` - Check STT/TTS availability
+- `isIOSDevice()` - Detect iOS for special handling
+- `extractSentences()` - Parse text for chunked TTS
+
+**Browser support:** Chrome, Safari, Edge (desktop & mobile). Firefox has TTS only.
